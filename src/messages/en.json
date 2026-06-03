@@ -1,0 +1,384 @@
+{
+  "app": {
+    "title": "PsiEval — Psychiatric Evaluation",
+    "tagline": "Psychiatric Clinical Evaluation System"
+  },
+  "nav": {
+    "dashboard": "Home",
+    "newEvaluation": "New Evaluation",
+    "viewer": "JSON Viewer",
+    "logout": "Sign out",
+    "language": "Language"
+  },
+  "login": {
+    "title": "System Access",
+    "subtitle": "Psychiatric Evaluation System",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "loading": "Verifying...",
+    "error": "Invalid username or password",
+    "serverError": "Connection error. Please try again."
+  },
+  "dashboard": {
+    "title": "Recent Evaluations",
+    "newEval": "New Evaluation",
+    "empty": "No evaluations recorded",
+    "emptyDesc": "Start by creating a new clinical evaluation",
+    "columns": {
+      "patient": "Patient",
+      "date": "Date",
+      "diagnosis": "Diagnosis",
+      "evaluator": "Evaluator",
+      "actions": "Actions"
+    },
+    "view": "View",
+    "export": "Export JSON"
+  },
+  "wizard": {
+    "steps": {
+      "demographics": "Demographics",
+      "chief_complaint": "Chief Complaint",
+      "phq9": "PHQ-9 Depression",
+      "gad7": "GAD-7 Anxiety",
+      "audit": "AUDIT Alcohol",
+      "mmse": "MMSE Cognition",
+      "panss": "PANSS Psychosis",
+      "mse": "Mental Status Exam",
+      "diagnosis": "Diagnosis",
+      "summary": "Summary"
+    },
+    "next": "Next",
+    "prev": "Previous",
+    "save": "Save Evaluation",
+    "saving": "Saving...",
+    "saveSuccess": "Evaluation saved successfully",
+    "saveError": "Error saving. Please try again.",
+    "progress": "Step {current} of {total}"
+  },
+  "demographics": {
+    "title": "Patient Demographics",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "birthDate": "Date of Birth",
+    "age": "Age (calculated)",
+    "sex": "Sex",
+    "sexOptions": {
+      "M": "Male",
+      "F": "Female",
+      "O": "Other"
+    },
+    "maritalStatus": "Marital Status",
+    "maritalOptions": {
+      "S": "Single",
+      "C": "Married",
+      "D": "Divorced",
+      "V": "Widowed",
+      "U": "Common-law"
+    },
+    "education": "Education",
+    "educationOptions": {
+      "none": "No formal education",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "highschool": "High School",
+      "technical": "Technical",
+      "university": "University",
+      "postgrad": "Postgraduate"
+    },
+    "occupation": "Occupation",
+    "phone": "Phone",
+    "evaluationDate": "Evaluation Date"
+  },
+  "chiefComplaint": {
+    "title": "Chief Complaint",
+    "complaint": "Chief complaint",
+    "complaintPlaceholder": "Describe the main reason for the visit...",
+    "duration": "Duration of symptoms",
+    "durationPlaceholder": "e.g. 3 weeks, 2 months...",
+    "mainSymptoms": "Main symptoms",
+    "symptomsPlaceholder": "List the most relevant symptoms..."
+  },
+  "phq9": {
+    "title": "PHQ-9 — Patient Health Questionnaire Depression Scale",
+    "instructions": "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
+    "options": {
+      "0": "Not at all",
+      "1": "Several days",
+      "2": "More than half the days",
+      "3": "Nearly every day"
+    },
+    "questions": [
+      "Little interest or pleasure in doing things",
+      "Feeling down, depressed, or hopeless",
+      "Trouble falling or staying asleep, or sleeping too much",
+      "Feeling tired or having little energy",
+      "Poor appetite or overeating",
+      "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+      "Trouble concentrating on things, such as reading the newspaper or watching television",
+      "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+      "Thoughts that you would be better off dead or of hurting yourself in some way"
+    ],
+    "score": "Total Score",
+    "interpretation": {
+      "minimal": "Minimal depression (0-4)",
+      "mild": "Mild depression (5-9)",
+      "moderate": "Moderate depression (10-14)",
+      "moderatelySevere": "Moderately severe depression (15-19)",
+      "severe": "Severe depression (20-27)"
+    }
+  },
+  "gad7": {
+    "title": "GAD-7 — Generalized Anxiety Disorder Scale",
+    "instructions": "Over the last 2 weeks, how often have you been bothered by the following problems?",
+    "options": {
+      "0": "Not at all",
+      "1": "Several days",
+      "2": "More than half the days",
+      "3": "Nearly every day"
+    },
+    "questions": [
+      "Feeling nervous, anxious, or on edge",
+      "Not being able to stop or control worrying",
+      "Worrying too much about different things",
+      "Trouble relaxing",
+      "Being so restless that it's hard to sit still",
+      "Becoming easily annoyed or irritable",
+      "Feeling afraid as if something awful might happen"
+    ],
+    "score": "Total Score",
+    "interpretation": {
+      "minimal": "Minimal anxiety (0-4)",
+      "mild": "Mild anxiety (5-9)",
+      "moderate": "Moderate anxiety (10-14)",
+      "severe": "Severe anxiety (15-21)"
+    }
+  },
+  "audit": {
+    "title": "AUDIT — Alcohol Use Disorders Identification Test",
+    "instructions": "Please answer the following questions about your alcohol use in the past year.",
+    "questions": [
+      {
+        "q": "How often do you have a drink containing alcohol?",
+        "options": ["Never", "Monthly or less", "2 to 4 times a month", "2 to 3 times a week", "4 or more times a week"]
+      },
+      {
+        "q": "How many drinks containing alcohol do you have on a typical day when you are drinking?",
+        "options": ["1 or 2", "3 or 4", "5 or 6", "7, 8 or 9", "10 or more"]
+      },
+      {
+        "q": "How often do you have six or more drinks on one occasion?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "How often during the last year have you found that you were not able to stop drinking once you had started?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "How often during the last year have you failed to do what was normally expected from you because of drinking?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "How often during the last year have you needed a first drink in the morning to get yourself going after a heavy drinking session?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "How often during the last year have you had a feeling of guilt or remorse after drinking?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "How often during the last year have you been unable to remember what happened the night before because you had been drinking?",
+        "options": ["Never", "Less than monthly", "Monthly", "Weekly", "Daily or almost daily"]
+      },
+      {
+        "q": "Have you or someone else been injured as a result of your drinking?",
+        "options": ["No", "", "Yes, but not in the last year", "", "Yes, during the last year"]
+      },
+      {
+        "q": "Has a relative, friend, doctor, or other health care worker been concerned about your drinking or suggested you cut down?",
+        "options": ["No", "", "Yes, but not in the last year", "", "Yes, during the last year"]
+      }
+    ],
+    "score": "Total Score",
+    "interpretation": {
+      "low": "Low risk (0-7)",
+      "hazardous": "Hazardous use (8-15)",
+      "harmful": "Harmful use (16-19)",
+      "dependent": "Probable dependence (20-40)"
+    }
+  },
+  "mmse": {
+    "title": "MMSE — Mini-Mental State Examination",
+    "instructions": "Brief cognitive evaluation. Apply each item and record the score obtained.",
+    "sections": {
+      "orientation_time": "Orientation in Time",
+      "orientation_place": "Orientation in Place",
+      "registration": "Registration",
+      "attention": "Attention & Calculation",
+      "recall": "Recall",
+      "language": "Language",
+      "construction": "Visuospatial Construction"
+    },
+    "items": [
+      { "section": "orientation_time", "q": "What year is it?", "max": 1 },
+      { "section": "orientation_time", "q": "What season is it?", "max": 1 },
+      { "section": "orientation_time", "q": "What month is it?", "max": 1 },
+      { "section": "orientation_time", "q": "What is today's date?", "max": 1 },
+      { "section": "orientation_time", "q": "What day of the week is it?", "max": 1 },
+      { "section": "orientation_place", "q": "What country are we in?", "max": 1 },
+      { "section": "orientation_place", "q": "What state/province are we in?", "max": 1 },
+      { "section": "orientation_place", "q": "What city are we in?", "max": 1 },
+      { "section": "orientation_place", "q": "What place are we in now? (hospital, clinic...)", "max": 1 },
+      { "section": "orientation_place", "q": "What floor or area are we on?", "max": 1 },
+      { "section": "registration", "q": "Register 3 words (ball, flag, tree) — 1 point per word recalled immediately", "max": 3 },
+      { "section": "attention", "q": "Serial 7s: 100-7=93, -7=86, -7=79, -7=72, -7=65 (1 point per correct answer, max 5)", "max": 5 },
+      { "section": "recall", "q": "Recall the 3 registered words (ball, flag, tree) — 1 point per word", "max": 3 },
+      { "section": "language", "q": "Name objects: show watch and pencil (1 point each)", "max": 2 },
+      { "section": "language", "q": "Repeat phrase: \"No ifs, ands, or buts\"", "max": 1 },
+      { "section": "language", "q": "3-step command: take paper, fold it, place on floor (1 point each step)", "max": 3 },
+      { "section": "language", "q": "Read and obey: \"CLOSE YOUR EYES\"", "max": 1 },
+      { "section": "language", "q": "Write a spontaneous sentence (subject, verb, meaning)", "max": 1 },
+      { "section": "construction", "q": "Copy figure of two interlocking pentagons", "max": 1 }
+    ],
+    "score": "Total Score",
+    "interpretation": {
+      "normal": "Normal (27-30)",
+      "mild": "Mild cognitive impairment (21-26)",
+      "moderate": "Moderate cognitive impairment (11-20)",
+      "severe": "Severe cognitive impairment (0-10)"
+    }
+  },
+  "panss": {
+    "title": "PANSS — Positive and Negative Syndrome Scale",
+    "instructions": "Rate each item on a scale from 1 (absent) to 7 (extreme) based on the clinical interview.",
+    "ratingScale": {
+      "1": "1 - Absent",
+      "2": "2 - Minimal",
+      "3": "3 - Mild",
+      "4": "4 - Moderate",
+      "5": "5 - Moderately Severe",
+      "6": "6 - Severe",
+      "7": "7 - Extreme"
+    },
+    "positive": {
+      "title": "Positive Scale (P)",
+      "items": [
+        "P1. Delusions",
+        "P2. Conceptual disorganization",
+        "P3. Hallucinations",
+        "P4. Excitement",
+        "P5. Grandiosity",
+        "P6. Suspiciousness/persecution",
+        "P7. Hostility"
+      ]
+    },
+    "negative": {
+      "title": "Negative Scale (N)",
+      "items": [
+        "N1. Blunted affect",
+        "N2. Emotional withdrawal",
+        "N3. Poor rapport",
+        "N4. Passive/apathetic social withdrawal",
+        "N5. Difficulty in abstract thinking",
+        "N6. Lack of spontaneity & flow of conversation",
+        "N7. Stereotyped thinking"
+      ]
+    },
+    "general": {
+      "title": "General Psychopathology Scale (G)",
+      "items": [
+        "G1. Somatic concern",
+        "G2. Anxiety",
+        "G3. Guilt feelings",
+        "G4. Tension",
+        "G5. Mannerisms and posturing",
+        "G6. Depression",
+        "G7. Motor retardation",
+        "G8. Uncooperativeness",
+        "G9. Unusual thought content",
+        "G10. Disorientation",
+        "G11. Poor attention",
+        "G12. Lack of judgment and insight",
+        "G13. Disturbance of volition",
+        "G14. Poor impulse control",
+        "G15. Preoccupation",
+        "G16. Active social avoidance"
+      ]
+    },
+    "scores": {
+      "positive": "Positive Score",
+      "negative": "Negative Score",
+      "general": "General Score",
+      "composite": "Composite Index",
+      "total": "Total Score"
+    }
+  },
+  "mse": {
+    "title": "Mental Status Examination (MSE)",
+    "sections": {
+      "appearance": "Appearance",
+      "attitude": "Attitude",
+      "psychomotor": "Psychomotor Activity",
+      "speech": "Speech",
+      "affect": "Affect",
+      "mood": "Mood (self-reported)",
+      "thoughtProcess": "Thought Process",
+      "thoughtContent": "Thought Content",
+      "perceptions": "Perceptions",
+      "cognition": "Cognition",
+      "insight": "Insight",
+      "judgment": "Judgment"
+    },
+    "placeholders": {
+      "appearance": "Describe general appearance, hygiene, dress, eye contact...",
+      "attitude": "e.g. cooperative, hostile, evasive, seductive...",
+      "psychomotor": "e.g. no abnormalities, psychomotor agitation, psychomotor retardation...",
+      "speech": "Describe rate, tone, volume, latency, fluency...",
+      "affect": "e.g. euthymic, anxious, dysphoric, labile, blunted, incongruent...",
+      "mood": "How does the patient feel? In their own words...",
+      "thoughtProcess": "e.g. coherent, circumstantial, tangential, flight of ideas, blocking...",
+      "thoughtContent": "Suicidal ideation, homicidal ideation, obsessions, phobias, delusions...",
+      "perceptions": "e.g. no abnormalities, auditory hallucinations, visual hallucinations, illusions...",
+      "cognition": "Orientation, memory, attention, abstraction...",
+      "insight": "e.g. good insight, partial, absent, denies illness...",
+      "judgment": "Ability to make decisions, social judgment..."
+    }
+  },
+  "diagnosis": {
+    "title": "Diagnosis",
+    "cie11Code": "ICD-11 Code",
+    "cie11Placeholder": "e.g. 6A70.0",
+    "cie11Description": "Diagnosis description",
+    "cie11DescPlaceholder": "Describe the diagnosis according to ICD-11...",
+    "additionalNotes": "Additional notes / Treatment plan",
+    "notesPlaceholder": "Clinical observations, treatment plan..."
+  },
+  "summary": {
+    "title": "Evaluation Summary",
+    "patient": "Patient",
+    "scales": "Applied Scales",
+    "mse": "Mental Status",
+    "diagnosis": "Diagnosis",
+    "exportJson": "Export JSON",
+    "exportSuccess": "JSON downloaded successfully"
+  },
+  "viewer": {
+    "title": "Evaluation Viewer",
+    "subtitle": "Load a JSON evaluation file to view it",
+    "loadFile": "Load JSON file",
+    "noFile": "No file loaded",
+    "sections": {
+      "demographics": "Patient Data",
+      "scales": "Scale Results",
+      "mse": "Mental Status Examination",
+      "diagnosis": "Diagnosis"
+    }
+  },
+  "severity": {
+    "minimal": "Minimal",
+    "mild": "Mild",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "normal": "Normal"
+  }
+}
