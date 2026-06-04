@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 interface EvalRow {
-  ID_EVALUACION: number;
+  ID: number;
   NOMBRE_PACIENTE: string;
   FECHA_EVALUACION: Date;
   CIE11_DESCRIPCION: string;
@@ -20,15 +20,21 @@ export default async function DashboardPage() {
 
   try {
     const result = await executeQuery<EvalRow>(
-      `SELECT ID_EVALUACION, NOMBRE_PACIENTE, FECHA_EVALUACION, CIE11_DESCRIPCION, ID_USUARIO
-       FROM PSIQ_EVALUACION
-       WHERE ACTIVO = '1' AND ID_USUARIO = :usuario
-       ORDER BY FECHA_EVALUACION DESC
+      `SELECT e.id,
+              u.nombres || ' ' || u.apellidos AS nombre_paciente,
+              e.fecha_evaluacion,
+              e.cie11_descripcion,
+              e.id_usuario
+       FROM tkr_evaluacion e
+       JOIN tkr_usuarios u ON e.id_paciente = u.id
+       WHERE e.activo = '1' AND e.id_usuario = :usuario
+       ORDER BY e.fecha_evaluacion DESC
        FETCH FIRST 50 ROWS ONLY`,
       { usuario: session!.username }
     );
     evaluations = (result.rows ?? []) as EvalRow[];
-  } catch {
+  } catch (err) {
+    console.error("Dashboard error loading evaluations:", err);
     dbError = true;
   }
 
@@ -87,9 +93,9 @@ export default async function DashboardPage() {
             </thead>
             <tbody>
               {evaluations.map((ev) => (
-                <tr key={ev.ID_EVALUACION}>
+                <tr key={ev.ID}>
                   <td style={{ color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-                    {ev.ID_EVALUACION}
+                    {ev.ID}
                   </td>
                   <td style={{ fontWeight: 500 }}>{ev.NOMBRE_PACIENTE}</td>
                   <td style={{ color: "var(--color-text-muted)" }}>
@@ -110,7 +116,7 @@ export default async function DashboardPage() {
                   <td>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
                       <Link
-                        href={`/evaluation/${ev.ID_EVALUACION}`}
+                        href={`/evaluation/${ev.ID}`}
                         className="btn btn-secondary btn-sm"
                       >
                         👁 {t("view")}

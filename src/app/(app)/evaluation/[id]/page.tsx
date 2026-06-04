@@ -12,8 +12,8 @@ export default async function EvaluationPage(props: PageProps<"/evaluation/[id]"
   let evaluation = null;
   try {
     const result = await executeQuery<{ EVALUACION_JSON: string }>(
-      `SELECT EVALUACION_JSON FROM PSIQ_EVALUACION
-       WHERE ID_EVALUACION = :id AND ID_USUARIO = :usuario AND ACTIVO = '1'`,
+      `SELECT evaluacion_json FROM tkr_evaluacion
+       WHERE id = :id AND id_usuario = :usuario AND activo = '1'`,
       { id: Number(id), usuario: session!.username }
     );
     if (!result.rows || result.rows.length === 0) notFound();
@@ -42,12 +42,10 @@ export default async function EvaluationPage(props: PageProps<"/evaluation/[id]"
           </div>
           <div className="grid-3">
             {[
-              ["Sexo", { M: "Masculino", F: "Femenino", O: "Otro" }[d.sex as string]],
-              ["Fecha de Nacimiento", d.birthDate],
-              ["Fecha de Evaluación", d.evaluationDate],
-              ["Estado Civil", d.maritalStatus],
-              ["Escolaridad", d.education],
-              ["Ocupación", d.occupation || "—"],
+              ["Nombres y Apellidos", `${d.firstName} ${d.lastName}`],
+              ["Correo Electrónico", d.email || "—"],
+              ["Teléfono", d.phone || "—"],
+              ["Fecha de Evaluación", d.evaluationDate || "—"],
             ].map(([k, v]) => (
               <div key={k}>
                 <div style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", textTransform: "uppercase" }}>{k}</div>

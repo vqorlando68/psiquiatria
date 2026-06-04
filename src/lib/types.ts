@@ -10,6 +10,7 @@ export interface Demographics {
   education: "none" | "primary" | "secondary" | "highschool" | "technical" | "university" | "postgrad";
   occupation: string;
   phone?: string;
+  email?: string;
   evaluationDate: string; // ISO date string
 }
 
@@ -79,8 +80,6 @@ export interface EvaluationData {
 }
 
 export type WizardStep =
-  | "demographics"
-  | "chief_complaint"
   | "phq9"
   | "gad7"
   | "audit"
@@ -91,8 +90,6 @@ export type WizardStep =
   | "summary";
 
 export const WIZARD_STEPS: WizardStep[] = [
-  "demographics",
-  "chief_complaint",
   "phq9",
   "gad7",
   "audit",

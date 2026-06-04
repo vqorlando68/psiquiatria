@@ -6,19 +6,7 @@
 
 -- ─── SEQUENCES ─────────────────────────────────────────────────────────────
 
-CREATE SEQUENCE PSIQ_EVALUACION_SEQ
-  START WITH 1
-  INCREMENT BY 1
-  NOCACHE
-  NOCYCLE;
-
-CREATE SEQUENCE PSIQ_ESCALA_SEQ
-  START WITH 1
-  INCREMENT BY 1
-  NOCACHE
-  NOCYCLE;
-
-CREATE SEQUENCE PSIQ_MSE_SEQ
+CREATE SEQUENCE tkr_evaluacion_seq
   START WITH 1
   INCREMENT BY 1
   NOCACHE
@@ -26,35 +14,36 @@ CREATE SEQUENCE PSIQ_MSE_SEQ
 
 -- ─── TABLES ────────────────────────────────────────────────────────────────
 
-CREATE TABLE PSIQ_EVALUACION (
-  ID_EVALUACION     NUMBER          NOT NULL,
-  ID_USUARIO        VARCHAR2(50)    NOT NULL,
-  FECHA_EVALUACION  DATE            NOT NULL,
-  -- Demografía
-  NOMBRE_PACIENTE   VARCHAR2(200)   NOT NULL,
-  FECHA_NACIMIENTO  DATE,
-  SEXO              CHAR(1),            -- M/F/O
-  ESCOLARIDAD       VARCHAR2(100),
-  OCUPACION         VARCHAR2(200),
-  ESTADO_CIVIL      VARCHAR2(50),
-  MOTIVO_CONSULTA   CLOB,
-  -- Diagnóstico
-  CIE11_CODIGO      VARCHAR2(30),
-  CIE11_DESCRIPCION VARCHAR2(500),
-  -- JSON completo de la evaluación
-  EVALUACION_JSON   CLOB,
-  -- Auditoría
-  FECHA_CREACION    DATE            DEFAULT SYSDATE NOT NULL,
-  FECHA_MODIFICACION DATE,
-  ACTIVO            CHAR(1)         DEFAULT '1' NOT NULL,
+CREATE TABLE tkr_evaluacion (
+  id                NUMBER          NOT NULL,
+  id_usuario        VARCHAR2(50)    NOT NULL, -- Evaluador (doctor)
+  id_paciente       NUMBER          NOT NULL, -- Paciente evaluado (FK a tkr_usuarios)
+  fecha_evaluacion  DATE            NOT NULL,
+  motivo_consulta   CLOB,                     -- Se mantiene en BD por compatibilidad, se puede guardar NULL
+  cie11_codigo      VARCHAR2(30),
+  cie11_descripcion VARCHAR2(500),
+  evaluacion_json   CLOB            NOT NULL, -- JSON completo de la evaluacion (escalas, examen mental, etc.)
+  fecha_creacion    DATE            DEFAULT SYSDATE NOT NULL,
+  fecha_modificacion DATE,
+  activo            CHAR(1)         DEFAULT '1' NOT NULL,
   --
-  CONSTRAINT PK_PSIQ_EVALUACION PRIMARY KEY (ID_EVALUACION),
-  CONSTRAINT CK_PSIQ_EVAL_SEXO   CHECK (SEXO IN ('M', 'F', 'O')),
-  CONSTRAINT CK_PSIQ_EVAL_ACTIVO CHECK (ACTIVO IN ('0', '1'))
+  CONSTRAINT PK_TKR_EVALUACION PRIMARY KEY (id),
+  CONSTRAINT CK_TKR_EVAL_ACTIVO CHECK (activo IN ('0', '1'))
 );
 
-COMMENT ON TABLE  PSIQ_EVALUACION              IS 'Evaluaciones psiquiátricas clínicas';
-COMMENT ON COLUMN PSIQ_EVALUACION.EVALUACION_JSON IS 'JSON completo de la evaluacion incluyendo escalas y MSE';
+COMMENT ON TABLE tkr_evaluacion IS 'Evaluaciones psiquiátricas clínicas asociadas a pacientes';
+
+-- ─── TRIGGERS ──────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE TRIGGER trg_bi_tkr_evaluacion
+BEFORE INSERT ON tkr_evaluacion
+FOR EACH ROW
+BEGIN
+  IF :NEW.id IS NULL THEN
+    SELECT tkr_evaluacion_seq.NEXTVAL INTO :NEW.id FROM DUAL;
+  END IF;
+END;
+/
 
 -- ─── PACKAGE SPEC ──────────────────────────────────────────────────────────
 
@@ -62,63 +51,43 @@ CREATE OR REPLACE PACKAGE pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   -- Inserta una nueva evaluación y devuelve el ID generado
+  -- Recibe un JSON en p_json_entrada
   -- -------------------------------------------------------------------------
   PROCEDURE p_insertar_evaluacion (
-    p_id_usuario        IN  PSIQ_EVALUACION.ID_USUARIO%TYPE,
-    p_nombre_paciente   IN  PSIQ_EVALUACION.NOMBRE_PACIENTE%TYPE,
-    p_fecha_evaluacion  IN  PSIQ_EVALUACION.FECHA_EVALUACION%TYPE,
-    p_fecha_nacimiento  IN  PSIQ_EVALUACION.FECHA_NACIMIENTO%TYPE  DEFAULT NULL,
-    p_sexo              IN  PSIQ_EVALUACION.SEXO%TYPE              DEFAULT NULL,
-    p_escolaridad       IN  PSIQ_EVALUACION.ESCOLARIDAD%TYPE        DEFAULT NULL,
-    p_ocupacion         IN  PSIQ_EVALUACION.OCUPACION%TYPE          DEFAULT NULL,
-    p_estado_civil      IN  PSIQ_EVALUACION.ESTADO_CIVIL%TYPE       DEFAULT NULL,
-    p_motivo_consulta   IN  CLOB                                    DEFAULT NULL,
-    p_cie11_codigo      IN  PSIQ_EVALUACION.CIE11_CODIGO%TYPE       DEFAULT NULL,
-    p_cie11_descripcion IN  PSIQ_EVALUACION.CIE11_DESCRIPCION%TYPE  DEFAULT NULL,
-    p_evaluacion_json   IN  CLOB                                    DEFAULT NULL,
-    p_id_evaluacion     OUT PSIQ_EVALUACION.ID_EVALUACION%TYPE
+    p_json_entrada      IN  CLOB,
+    p_id                OUT NUMBER
   );
 
   -- -------------------------------------------------------------------------
   -- Actualiza una evaluación existente
+  -- Recibe un JSON en p_json_entrada
   -- -------------------------------------------------------------------------
   PROCEDURE p_actualizar_evaluacion (
-    p_id_evaluacion     IN  PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario        IN  PSIQ_EVALUACION.ID_USUARIO%TYPE,
-    p_nombre_paciente   IN  PSIQ_EVALUACION.NOMBRE_PACIENTE%TYPE   DEFAULT NULL,
-    p_fecha_evaluacion  IN  PSIQ_EVALUACION.FECHA_EVALUACION%TYPE  DEFAULT NULL,
-    p_fecha_nacimiento  IN  PSIQ_EVALUACION.FECHA_NACIMIENTO%TYPE  DEFAULT NULL,
-    p_sexo              IN  PSIQ_EVALUACION.SEXO%TYPE              DEFAULT NULL,
-    p_escolaridad       IN  PSIQ_EVALUACION.ESCOLARIDAD%TYPE        DEFAULT NULL,
-    p_ocupacion         IN  PSIQ_EVALUACION.OCUPACION%TYPE          DEFAULT NULL,
-    p_estado_civil      IN  PSIQ_EVALUACION.ESTADO_CIVIL%TYPE       DEFAULT NULL,
-    p_motivo_consulta   IN  CLOB                                    DEFAULT NULL,
-    p_cie11_codigo      IN  PSIQ_EVALUACION.CIE11_CODIGO%TYPE       DEFAULT NULL,
-    p_cie11_descripcion IN  PSIQ_EVALUACION.CIE11_DESCRIPCION%TYPE  DEFAULT NULL,
-    p_evaluacion_json   IN  CLOB                                    DEFAULT NULL
+    p_json_entrada      IN  CLOB
   );
 
   -- -------------------------------------------------------------------------
   -- Borrado lógico de una evaluación
+  -- Recibe un JSON en p_json_entrada
   -- -------------------------------------------------------------------------
   PROCEDURE p_eliminar_evaluacion (
-    p_id_evaluacion IN PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario    IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   );
 
   -- -------------------------------------------------------------------------
   -- Obtiene el JSON de una evaluación
+  -- Recibe un JSON en p_json_entrada
   -- -------------------------------------------------------------------------
   FUNCTION f_obtener_evaluacion (
-    p_id_evaluacion IN PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario    IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   ) RETURN CLOB;
 
   -- -------------------------------------------------------------------------
   -- Devuelve un SYS_REFCURSOR con las evaluaciones de un usuario
+  -- Recibe un JSON en p_json_entrada
   -- -------------------------------------------------------------------------
   FUNCTION f_listar_evaluaciones (
-    p_id_usuario IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   ) RETURN SYS_REFCURSOR;
 
 END pkgln_evaluacion_psiquiatria;
@@ -130,41 +99,26 @@ CREATE OR REPLACE PACKAGE BODY pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   PROCEDURE p_insertar_evaluacion (
-    p_id_usuario        IN  PSIQ_EVALUACION.ID_USUARIO%TYPE,
-    p_nombre_paciente   IN  PSIQ_EVALUACION.NOMBRE_PACIENTE%TYPE,
-    p_fecha_evaluacion  IN  PSIQ_EVALUACION.FECHA_EVALUACION%TYPE,
-    p_fecha_nacimiento  IN  PSIQ_EVALUACION.FECHA_NACIMIENTO%TYPE  DEFAULT NULL,
-    p_sexo              IN  PSIQ_EVALUACION.SEXO%TYPE              DEFAULT NULL,
-    p_escolaridad       IN  PSIQ_EVALUACION.ESCOLARIDAD%TYPE        DEFAULT NULL,
-    p_ocupacion         IN  PSIQ_EVALUACION.OCUPACION%TYPE          DEFAULT NULL,
-    p_estado_civil      IN  PSIQ_EVALUACION.ESTADO_CIVIL%TYPE       DEFAULT NULL,
-    p_motivo_consulta   IN  CLOB                                    DEFAULT NULL,
-    p_cie11_codigo      IN  PSIQ_EVALUACION.CIE11_CODIGO%TYPE       DEFAULT NULL,
-    p_cie11_descripcion IN  PSIQ_EVALUACION.CIE11_DESCRIPCION%TYPE  DEFAULT NULL,
-    p_evaluacion_json   IN  CLOB                                    DEFAULT NULL,
-    p_id_evaluacion     OUT PSIQ_EVALUACION.ID_EVALUACION%TYPE
+    p_json_entrada      IN  CLOB,
+    p_id                OUT NUMBER
   ) IS
-    v_id PSIQ_EVALUACION.ID_EVALUACION%TYPE;
   BEGIN
-    SELECT PSIQ_EVALUACION_SEQ.NEXTVAL INTO v_id FROM DUAL;
-
-    INSERT INTO PSIQ_EVALUACION (
-      ID_EVALUACION, ID_USUARIO, FECHA_EVALUACION,
-      NOMBRE_PACIENTE, FECHA_NACIMIENTO, SEXO,
-      ESCOLARIDAD, OCUPACION, ESTADO_CIVIL,
-      MOTIVO_CONSULTA, CIE11_CODIGO, CIE11_DESCRIPCION,
-      EVALUACION_JSON, FECHA_CREACION, ACTIVO
+    INSERT INTO tkr_evaluacion (
+      id_usuario, id_paciente, fecha_evaluacion,
+      motivo_consulta, cie11_codigo, cie11_descripcion,
+      evaluacion_json, fecha_creacion, activo
     ) VALUES (
-      v_id, p_id_usuario, p_fecha_evaluacion,
-      p_nombre_paciente, p_fecha_nacimiento, p_sexo,
-      p_escolaridad, p_ocupacion, p_estado_civil,
-      p_motivo_consulta, p_cie11_codigo, p_cie11_descripcion,
-      p_evaluacion_json, SYSDATE, '1'
-    );
+      JSON_VALUE(p_json_entrada, '$.id_usuario'),
+      TO_NUMBER(JSON_VALUE(p_json_entrada, '$.id_paciente')),
+      TO_DATE(JSON_VALUE(p_json_entrada, '$.fecha_evaluacion'), 'YYYY-MM-DD'),
+      JSON_VALUE(p_json_entrada, '$.motivo_consulta'),
+      JSON_VALUE(p_json_entrada, '$.cie11_codigo'),
+      JSON_VALUE(p_json_entrada, '$.cie11_descripcion'),
+      JSON_QUERY(p_json_entrada, '$.evaluacion_json' RETURNING CLOB),
+      SYSDATE, '1'
+    ) RETURNING id INTO p_id;
 
     COMMIT;
-    p_id_evaluacion := v_id;
-
   EXCEPTION
     WHEN OTHERS THEN
       ROLLBACK;
@@ -173,37 +127,19 @@ CREATE OR REPLACE PACKAGE BODY pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   PROCEDURE p_actualizar_evaluacion (
-    p_id_evaluacion     IN  PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario        IN  PSIQ_EVALUACION.ID_USUARIO%TYPE,
-    p_nombre_paciente   IN  PSIQ_EVALUACION.NOMBRE_PACIENTE%TYPE   DEFAULT NULL,
-    p_fecha_evaluacion  IN  PSIQ_EVALUACION.FECHA_EVALUACION%TYPE  DEFAULT NULL,
-    p_fecha_nacimiento  IN  PSIQ_EVALUACION.FECHA_NACIMIENTO%TYPE  DEFAULT NULL,
-    p_sexo              IN  PSIQ_EVALUACION.SEXO%TYPE              DEFAULT NULL,
-    p_escolaridad       IN  PSIQ_EVALUACION.ESCOLARIDAD%TYPE        DEFAULT NULL,
-    p_ocupacion         IN  PSIQ_EVALUACION.OCUPACION%TYPE          DEFAULT NULL,
-    p_estado_civil      IN  PSIQ_EVALUACION.ESTADO_CIVIL%TYPE       DEFAULT NULL,
-    p_motivo_consulta   IN  CLOB                                    DEFAULT NULL,
-    p_cie11_codigo      IN  PSIQ_EVALUACION.CIE11_CODIGO%TYPE       DEFAULT NULL,
-    p_cie11_descripcion IN  PSIQ_EVALUACION.CIE11_DESCRIPCION%TYPE  DEFAULT NULL,
-    p_evaluacion_json   IN  CLOB                                    DEFAULT NULL
+    p_json_entrada      IN  CLOB
   ) IS
   BEGIN
-    UPDATE PSIQ_EVALUACION SET
-      NOMBRE_PACIENTE    = NVL(p_nombre_paciente,   NOMBRE_PACIENTE),
-      FECHA_EVALUACION   = NVL(p_fecha_evaluacion,  FECHA_EVALUACION),
-      FECHA_NACIMIENTO   = NVL(p_fecha_nacimiento,  FECHA_NACIMIENTO),
-      SEXO               = NVL(p_sexo,              SEXO),
-      ESCOLARIDAD        = NVL(p_escolaridad,        ESCOLARIDAD),
-      OCUPACION          = NVL(p_ocupacion,          OCUPACION),
-      ESTADO_CIVIL       = NVL(p_estado_civil,       ESTADO_CIVIL),
-      MOTIVO_CONSULTA    = NVL(p_motivo_consulta,    MOTIVO_CONSULTA),
-      CIE11_CODIGO       = NVL(p_cie11_codigo,       CIE11_CODIGO),
-      CIE11_DESCRIPCION  = NVL(p_cie11_descripcion,  CIE11_DESCRIPCION),
-      EVALUACION_JSON    = NVL(p_evaluacion_json,    EVALUACION_JSON),
-      FECHA_MODIFICACION = SYSDATE
-    WHERE ID_EVALUACION = p_id_evaluacion
-      AND ID_USUARIO    = p_id_usuario
-      AND ACTIVO        = '1';
+    UPDATE tkr_evaluacion SET
+      fecha_evaluacion   = NVL(TO_DATE(JSON_VALUE(p_json_entrada, '$.fecha_evaluacion'), 'YYYY-MM-DD'), fecha_evaluacion),
+      motivo_consulta    = NVL(JSON_VALUE(p_json_entrada, '$.motivo_consulta'), motivo_consulta),
+      cie11_codigo       = NVL(JSON_VALUE(p_json_entrada, '$.cie11_codigo'), cie11_codigo),
+      cie11_descripcion  = NVL(JSON_VALUE(p_json_entrada, '$.cie11_descripcion'), cie11_descripcion),
+      evaluacion_json    = NVL(JSON_QUERY(p_json_entrada, '$.evaluacion_json' RETURNING CLOB), evaluacion_json),
+      fecha_modificacion = SYSDATE
+    WHERE id         = TO_NUMBER(JSON_VALUE(p_json_entrada, '$.id'))
+      AND id_usuario = JSON_VALUE(p_json_entrada, '$.id_usuario')
+      AND activo     = '1';
 
     COMMIT;
   EXCEPTION
@@ -214,14 +150,13 @@ CREATE OR REPLACE PACKAGE BODY pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   PROCEDURE p_eliminar_evaluacion (
-    p_id_evaluacion IN PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario    IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   ) IS
   BEGIN
-    UPDATE PSIQ_EVALUACION
-      SET ACTIVO = '0', FECHA_MODIFICACION = SYSDATE
-    WHERE ID_EVALUACION = p_id_evaluacion
-      AND ID_USUARIO    = p_id_usuario;
+    UPDATE tkr_evaluacion
+       SET activo = '0', fecha_modificacion = SYSDATE
+     WHERE id         = TO_NUMBER(JSON_VALUE(p_json_entrada, '$.id'))
+       AND id_usuario = JSON_VALUE(p_json_entrada, '$.id_usuario');
     COMMIT;
   EXCEPTION
     WHEN OTHERS THEN
@@ -231,17 +166,16 @@ CREATE OR REPLACE PACKAGE BODY pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   FUNCTION f_obtener_evaluacion (
-    p_id_evaluacion IN PSIQ_EVALUACION.ID_EVALUACION%TYPE,
-    p_id_usuario    IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   ) RETURN CLOB IS
     v_json CLOB;
   BEGIN
-    SELECT EVALUACION_JSON
+    SELECT evaluacion_json
       INTO v_json
-      FROM PSIQ_EVALUACION
-     WHERE ID_EVALUACION = p_id_evaluacion
-       AND ID_USUARIO    = p_id_usuario
-       AND ACTIVO        = '1';
+      FROM tkr_evaluacion
+     WHERE id         = TO_NUMBER(JSON_VALUE(p_json_entrada, '$.id'))
+       AND id_usuario = JSON_VALUE(p_json_entrada, '$.id_usuario')
+       AND activo     = '1';
     RETURN v_json;
   EXCEPTION
     WHEN NO_DATA_FOUND THEN
@@ -250,27 +184,25 @@ CREATE OR REPLACE PACKAGE BODY pkgln_evaluacion_psiquiatria AS
 
   -- -------------------------------------------------------------------------
   FUNCTION f_listar_evaluaciones (
-    p_id_usuario IN PSIQ_EVALUACION.ID_USUARIO%TYPE
+    p_json_entrada      IN  CLOB
   ) RETURN SYS_REFCURSOR IS
     v_cursor SYS_REFCURSOR;
   BEGIN
     OPEN v_cursor FOR
-      SELECT ID_EVALUACION,
-             NOMBRE_PACIENTE,
-             FECHA_EVALUACION,
-             CIE11_CODIGO,
-             CIE11_DESCRIPCION,
-             ID_USUARIO,
-             FECHA_CREACION
-        FROM PSIQ_EVALUACION
-       WHERE ID_USUARIO = p_id_usuario
-         AND ACTIVO     = '1'
-       ORDER BY FECHA_EVALUACION DESC;
+      SELECT e.id,
+             u.nombres || ' ' || u.apellidos AS nombre_paciente,
+             e.fecha_evaluacion,
+             e.cie11_codigo,
+             e.cie11_descripcion,
+             e.id_usuario,
+             e.fecha_creacion
+        FROM tkr_evaluacion e
+        JOIN tkr_usuarios u ON e.id_paciente = u.id
+       WHERE e.id_usuario = JSON_VALUE(p_json_entrada, '$.id_usuario')
+         AND e.activo     = '1'
+       ORDER BY e.fecha_evaluacion DESC;
     RETURN v_cursor;
   END f_listar_evaluaciones;
 
 END pkgln_evaluacion_psiquiatria;
 /
-
--- ─── GRANTS (adjust schema as needed) ─────────────────────────────────────
--- GRANT EXECUTE ON pkgln_evaluacion_psiquiatria TO TEKER_DEV;
