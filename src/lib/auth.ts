@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { executeQuery } from "./db";
+import oracledb from "oracledb";
 
 export interface SessionUser {
   username: string;
@@ -24,9 +25,9 @@ export async function validateCredentials(
     const result = await executeQuery<{ RESULT: number }>(
       `BEGIN :result := pkgln_seguridad.f_validar_clave(:usuario, :clave, 4); END;`,
       {
-        result: { dir: 3003, type: 2010 }, // BIND_OUT, NUMBER
-        usuario: username,
-        clave: password,
+        result: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+        usuario: { val: username, type: oracledb.STRING },
+        clave: { val: password, type: oracledb.STRING },
       }
     );
     const outBinds = result.outBinds as { result: number };
